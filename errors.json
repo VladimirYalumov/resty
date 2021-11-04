@@ -1,0 +1,64 @@
+{
+  "errors" : {
+      "0": {
+        "code": 0,
+        "httpCode": 500,
+        "message": "Internal error",
+        "description": "Unable to add data to the table"
+      },
+      "1": {
+        "code": 1,
+        "httpCode": 500,
+        "message": "Internal error",
+        "description": "Unable to send message"
+      },
+      "2": {
+        "code": 2,
+        "httpCode": 406,
+        "message": "Invalid request",
+        "description": "Request does not meet the requirements"
+      },
+      "3": {
+        "code": 3,
+        "httpCode": 400,
+        "message": "",
+        "description": "Custom errors that will continue the flow"
+      },
+      "4": {
+        "code": 4,
+        "httpCode": 403,
+        "message": "Incorrect verify code",
+        "description": "Incorrect verify code or code is no longer in redis"
+      },
+      "5": {
+        "code": 5,
+        "httpCode": 500,
+        "message": "Internal error",
+        "description": "Unable to get data from the table"
+      },
+      "6": {
+        "code": 6,
+        "httpCode": 403,
+        "message": "Access denied",
+        "description": "Invalid client"
+      },
+      "7": {
+        "code": 7,
+        "httpCode": 404,
+        "message": "User not found",
+        "description": "User not found in db"
+      },
+      "8": {
+        "code": 8,
+        "httpCode": 403,
+        "message": "User is not verify",
+        "description": "User in db is not active"
+      },
+      "9": {
+        "code": 9,
+        "httpCode": 401,
+        "message": "User is unauthorized",
+        "description": "User has not an auth token"
+      }
+  }
+}

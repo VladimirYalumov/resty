@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+    <title>YOUR VERIFICATION CODE</title>
+    <style type="text/css">
+        .container {
+            background-color: #262624;
+        }
+        h1 {
+            text-align: center;
+            padding: 3rem;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        p {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        .table {
+            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 1px solid #dddddd;
+            font-size: 36px;
+            border-collapse: collapse;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        .table th {
+            font-weight: bold;
+            padding: 5px;
+            background: #efefef;
+            border: 1px solid #dddddd;
+        }
+        .table td {
+            border: 1px solid #dddddd;
+            padding: 5px;
+        }
+
+        @media (min-width: 1080px) {
+            .p-7 {
+                padding-left: 7rem;
+                padding-right: 7rem;
+            }
+
+            .card {
+                width: 50%;
+                margin: 0 auto;
+                background-color: white;
+                padding-bottom: 3rem;
+            }
+        }
+        @media (max-width: 1079px) {
+            .p-7 {}
+            .card {
+                width: 100%;
+                margin: 0 auto;
+                background-color: white;
+                padding-bottom: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>YOUR VERIFICATION CODE</h1>
+        <p class="p-7" style="text-align: center;">Use this code to verify your account on <a href="http://deewave.online/">deewave.online</a></p>
+        <div class="p-7" style="margin-bottom: 3rem">
+            <table class="table">
+                <tbody>
+                <tr>
+                    <td>{{.Num1}}</td>
+                    <td>{{.Num2}}</td>
+                    <td>{{.Num3}}</td>
+                    <td>{{.Num4}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="p-7">Thanks,<br> Deewave.online</p>
+    </div>
+</div>
+</body>
+</html>
