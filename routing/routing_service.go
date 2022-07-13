@@ -2,11 +2,11 @@ package routing
 
 import (
 	"encoding/json"
-	"goRestApi_main/routing/cusotom_errors"
-	"goRestApi_main/routing/responses"
-	"goRestApi_main/routing/responsibility"
 	"io/ioutil"
 	"net/http"
+	"resty/routing/cusotom_errors"
+	"resty/routing/responses"
+	"resty/routing/responsibility"
 	"strconv"
 )
 

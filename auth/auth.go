@@ -2,13 +2,13 @@ package auth
 
 import (
 	"errors"
-	"goRestApi_main/helpers"
-	"goRestApi_main/orm"
-	"goRestApi_main/redis"
-	"goRestApi_main/routing/requests"
+	"resty/helpers"
+	"resty/orm"
+	"resty/redis"
+	"resty/routing/requests"
 )
 
-const AUTH_ERROR_INVALID_PASSWORD = "Invalid Password"
+const ErrorInvalidPassword = "Invalid Password"
 
 func SignUp(request *requests.SignUpRequest) error {
 	user := orm.User{
@@ -24,7 +24,7 @@ func SignUp(request *requests.SignUpRequest) error {
 }
 
 func CheckCode(request requests.VerifyUserRequest) bool {
-	code := redis.RedisClient.Get(redis.CreateKey(redis.REDIS_EMAIL_AUTH_CODE, request.Email)).Val()
+	code := redis.Client.Get(redis.CreateKey(redis.EmailAuthCode, request.Email)).Val()
 	if code == "" {
 		return false
 	}
@@ -55,7 +55,7 @@ func SignIn(request *requests.SignInRequest) (bool, error, string) {
 	}
 
 	if user.Password != helpers.EncryptPassword(request.Password) {
-		errInvalidPassword := errors.New(AUTH_ERROR_INVALID_PASSWORD)
+		errInvalidPassword := errors.New(ErrorInvalidPassword)
 		return false, errInvalidPassword, ""
 	}
 

@@ -2,7 +2,7 @@ package responsibility
 
 import (
 	"fmt"
-	"goRestApi_main/routing/cusotom_errors"
+	"resty/routing/cusotom_errors"
 )
 
 type RequestCheckBody struct {

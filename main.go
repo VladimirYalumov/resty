@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"goRestApi_main/config"
-	"goRestApi_main/routing"
 	"log"
 	"net/http"
+	"resty/config"
+	"resty/routing"
 )
+
+func init() {
+	config.Init()
+}
 
 func main() {
 	config.Init()

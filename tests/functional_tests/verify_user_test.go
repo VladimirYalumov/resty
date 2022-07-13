@@ -4,15 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
-	"goRestApi_main/config"
-	"goRestApi_main/orm"
-	"goRestApi_main/redis"
-	"goRestApi_main/routing"
-	"goRestApi_main/routing/cusotom_errors"
-	"goRestApi_main/routing/requests"
-	"goRestApi_main/routing/responses"
 	"net/http"
 	"net/http/httptest"
+	"resty/config"
+	"resty/orm"
+	"resty/redis"
+	"resty/routing"
+	"resty/routing/cusotom_errors"
+	"resty/routing/requests"
+	"resty/routing/responses"
 	"strconv"
 	"testing"
 	"time"
@@ -41,7 +41,7 @@ func TestInitVerifyUser(t *testing.T) {
 	if timeError != nil {
 		t.Fatal(err)
 	}
-	redis.RedisClient.Set(redis.CreateKey(redis.REDIS_EMAIL_AUTH_CODE, userVerifyUserRequest.Email), code, timeLimit)
+	redis.Client.Set(redis.CreateKey(redis.EmailAuthCode, userVerifyUserRequest.Email), code, timeLimit)
 	err = clientVerifyUser.Create()
 	if err != nil {
 		t.Fatal(err)
@@ -198,6 +198,6 @@ func TestCloseVerifyUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	redis.RedisClient.Del(redis.CreateKey(redis.REDIS_EMAIL_AUTH_CODE, userVerifyUserRequest.Email))
+	redis.Client.Del(redis.CreateKey(redis.EmailAuthCode, userVerifyUserRequest.Email))
 	config.Close()
 }

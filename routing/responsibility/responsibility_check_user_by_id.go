@@ -1,8 +1,8 @@
 package responsibility
 
 import (
-	"goRestApi_main/orm"
-	"goRestApi_main/routing/cusotom_errors"
+	"resty/orm"
+	"resty/routing/cusotom_errors"
 )
 
 type RequestCheckUserById struct {

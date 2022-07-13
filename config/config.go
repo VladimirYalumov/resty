@@ -1,12 +1,12 @@
 package config
 
 import (
-	"goRestApi_main/mail"
-	"goRestApi_main/orm"
-	"goRestApi_main/redis"
-	"goRestApi_main/routing"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"resty/mail"
+	"resty/orm"
+	"resty/redis"
+	"resty/routing"
 )
 
 type Conf struct {

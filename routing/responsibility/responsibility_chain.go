@@ -1,9 +1,9 @@
 package responsibility
 
 import (
-	"goRestApi_main/orm"
-	"goRestApi_main/routing/cusotom_errors"
-	"goRestApi_main/routing/requests"
+	"resty/orm"
+	"resty/routing/cusotom_errors"
+	"resty/routing/requests"
 )
 
 const ResponsibilityCheckBody = "check_body"

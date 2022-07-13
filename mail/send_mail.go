@@ -4,19 +4,19 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"goRestApi_main/redis"
 	"html/template"
 	"log"
 	"math/rand"
 	"net/smtp"
+	"resty/redis"
 	"strconv"
 	"strings"
 	"time"
 )
 
-const SUBJECT_AUTH = "Confirm sign up on deewave.online"
-const CODE_NUMBERS_COUNT = 4
-const CODE_LIFETIME = "10"
+const subjectAuth = "Confirm sign up on deewave.online"
+const codeNumberCount = 4
+const CodeLifeTime = "10"
 
 type Code struct {
 	Num1 string
@@ -75,9 +75,7 @@ func SendAuthMessage(email string) (bool, error) {
 	mail := Mail{}
 	mail.senderId = c.SenderName
 	mail.toIds = email
-	mail.subject = SUBJECT_AUTH
-
-	redis.RedisClient.Set("name", "Elliot", 0)
+	mail.subject = subjectAuth
 
 	smtpServer := SmtpServer{host: c.Smtp, port: "465"}
 
@@ -149,14 +147,14 @@ func createBody(numbers []string) string {
 
 func BuildCode(email string) ([]string, bool) {
 	rand.Seed(time.Now().Unix())
-	var code [CODE_NUMBERS_COUNT]int
+	var code [codeNumberCount]int
 	var result []string
-	for i := 0; i < CODE_NUMBERS_COUNT; i++ {
+	for i := 0; i < codeNumberCount; i++ {
 		code[i] = rand.Intn(9)
 		result = append(result, strconv.Itoa(code[i]))
 	}
 
-	authCodeCounter := redis.RedisClient.Get(redis.CreateKey(redis.REDIS_EMAIL_AUTH_CODE_COUNT, email)).Val()
+	authCodeCounter := redis.Client.Get(redis.CreateKey(redis.EmailAuthCodeCount, email)).Val()
 
 	if authCodeCounter == "" {
 		authCodeCounter = "1"
@@ -171,9 +169,9 @@ func BuildCode(email string) ([]string, bool) {
 			authCodeCounter = strconv.Itoa(authCodeCounterInt)
 		}
 	}
-	timelimit, _ := time.ParseDuration(fmt.Sprintf("%sm", CODE_LIFETIME))
-	redis.RedisClient.Set(redis.CreateKey(redis.REDIS_EMAIL_AUTH_CODE_COUNT, email), authCodeCounter, timelimit)
-	redis.RedisClient.Set(redis.CreateKey(redis.REDIS_EMAIL_AUTH_CODE, email), strings.Join(result, ""), timelimit)
+	timelimit, _ := time.ParseDuration(fmt.Sprintf("%sm", CodeLifeTime))
+	redis.Client.Set(redis.CreateKey(redis.EmailAuthCodeCount, email), authCodeCounter, timelimit)
+	redis.Client.Set(redis.CreateKey(redis.EmailAuthCode, email), strings.Join(result, ""), timelimit)
 
 	return result, true
 }

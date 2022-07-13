@@ -1,8 +1,8 @@
 package responsibility
 
 import (
-	"goRestApi_main/helpers"
-	"goRestApi_main/routing/cusotom_errors"
+	"resty/helpers"
+	"resty/routing/cusotom_errors"
 )
 
 type RequestCheckVerifyUser struct {

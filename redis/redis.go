@@ -5,19 +5,19 @@ import (
 	"github.com/go-redis/redis"
 )
 
-const REDIS_EMAIL_AUTH_CODE = "auth_code_"
-const REDIS_EMAIL_AUTH_CODE_COUNT = "auth_code_count_"
+const EmailAuthCode = "auth_code_"
+const EmailAuthCodeCount = "auth_code_count_"
 
-var RedisClient *redis.Client
+var Client *redis.Client
 
 func InitRedis(host string) {
-	RedisClient = redis.NewClient(&redis.Options{
+	Client = redis.NewClient(&redis.Options{
 		Addr:     host,
 		Password: "",
 		DB:       0,
 	})
 
-	_, err := RedisClient.Ping().Result()
+	_, err := Client.Ping().Result()
 	if err != nil {
 		panic(err)
 	}

@@ -4,18 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"goRestApi_main/auth"
-	"goRestApi_main/mail"
-	"goRestApi_main/orm"
-	"goRestApi_main/routing/cusotom_errors"
-	"goRestApi_main/routing/requests"
-	"goRestApi_main/routing/responses"
-	"goRestApi_main/routing/responsibility"
 	"net/http"
+	"resty/auth"
+	"resty/mail"
+	"resty/orm"
+	"resty/routing/cusotom_errors"
+	"resty/routing/requests"
+	"resty/routing/responses"
+	"resty/routing/responsibility"
 	"strconv"
 )
-
-var check bool
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
 	var request requests.SignUpRequest
@@ -25,10 +23,12 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		Request:          request,
 		Responsibilities: responsibility.GetResponsibilities(),
 	}
-	check, w = CheckAction(w, requestFlow, err)
+	check, w := CheckAction(w, requestFlow, err)
 	if !check {
 		return
 	}
+
+	// Logic
 	var currentError cusotom_errors.CurrentError
 	if auth.CheckUserByEmail(request.Email) {
 		currentError.Code = cusotom_errors.ErrorCustomError
@@ -66,10 +66,12 @@ func VerifyUser(w http.ResponseWriter, r *http.Request) {
 		Email:            request.Email,
 	}
 	requestFlow.Responsibilities[responsibility.ResponsibilityCheckUserByEmail] = true
-	check, w = CheckAction(w, requestFlow, err)
+	check, w := CheckAction(w, requestFlow, err)
 	if !check {
 		return
 	}
+
+	// Logic
 	var currentError cusotom_errors.CurrentError
 	if auth.CheckCode(request) {
 		if auth.VerifyUser(request.Email) != nil {
@@ -100,15 +102,17 @@ func SendVerifyCode(w http.ResponseWriter, r *http.Request) {
 		Email:            request.Email,
 	}
 	requestFlow.Responsibilities[responsibility.ResponsibilityCheckUserByEmail] = true
-	check, w = CheckAction(w, requestFlow, err)
+	check, w := CheckAction(w, requestFlow, err)
 	if !check {
 		return
 	}
+
+	// Logic
 	var currentError cusotom_errors.CurrentError
 	successSendMail, errSendMail := mail.SendAuthMessage(request.Email)
 	if !successSendMail && errSendMail == nil {
 		currentError.Code = cusotom_errors.ErrorCustomError
-		currentError.Message = fmt.Sprintf("For email %s, the message sending limit has been exceeded. Wait %s minutes", request.Email, mail.CODE_LIFETIME)
+		currentError.Message = fmt.Sprintf("For email %s, the message sending limit has been exceeded. Wait %s minutes", request.Email, mail.CodeLifeTime)
 		w = getCustomError(currentError, w)
 		return
 	}
@@ -134,18 +138,20 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	requestFlow.Responsibilities[responsibility.ResponsibilityCheckUserByEmail] = true
 	requestFlow.Responsibilities[responsibility.ResponsibilityCheckVerifyUser] = true
-	check, w = CheckAction(w, requestFlow, err)
+	check, w := CheckAction(w, requestFlow, err)
 	if !check {
 		return
 	}
+
+	// Logic
 	var currentError cusotom_errors.CurrentError
 
 	successGetToken, getTokenError, token := auth.SignIn(&request)
 
 	if !successGetToken && getTokenError != nil {
-		if getTokenError.Error() == auth.AUTH_ERROR_INVALID_PASSWORD {
+		if getTokenError.Error() == auth.ErrorInvalidPassword {
 			currentError.Code = cusotom_errors.ErrorCustomError
-			currentError.Message = auth.AUTH_ERROR_INVALID_PASSWORD
+			currentError.Message = auth.ErrorInvalidPassword
 			w = getCustomError(currentError, w)
 			return
 		}
@@ -175,10 +181,12 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 	requestFlow.Responsibilities[responsibility.ResponsibilityCheckUserById] = true
 	requestFlow.Responsibilities[responsibility.ResponsibilityCheckVerifyUser] = true
 	requestFlow.Responsibilities[responsibility.ResponsibilityCheckAuth] = true
-	check, w = CheckAction(w, requestFlow, err)
+	check, w := CheckAction(w, requestFlow, err)
 	if !check {
 		return
 	}
+
+	// Logic
 	var currentError cusotom_errors.CurrentError
 	deleteToken := auth.SignOut(request.UserId, request.Client)
 	if deleteToken != nil {
@@ -210,7 +218,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	requestFlow.Responsibilities[responsibility.ResponsibilityCheckUserById] = true
 	requestFlow.Responsibilities[responsibility.ResponsibilityCheckVerifyUser] = true
 	requestFlow.Responsibilities[responsibility.ResponsibilityCheckAuth] = true
-	check, w = CheckAction(w, requestFlow, err)
+	check, w := CheckAction(w, requestFlow, err)
 	if !check {
 		return
 	}

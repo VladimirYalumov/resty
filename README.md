@@ -44,6 +44,7 @@ redis_host: "127.0.0.1:6378"
 
 start project
 <pre>
+go mod vendor
 go run .
 </pre>
 
