@@ -70,7 +70,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *handler) Endpoint(
 	method,
 	path string,
-	request requests.Request,
+	request func() requests.Request,
 	action func(ctx context.Context, req requests.Request) (responses.Response, int),
 	mm ...string,
 ) {
