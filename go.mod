@@ -1,10 +1,11 @@
-module resty
+module github.com/VladimirYalumov/resty
 
 go 1.20
 
 require (
 	github.com/VladimirYalumov/logger v0.1.1
 	github.com/VladimirYalumov/tracer v0.0.1
+	github.com/rs/cors v1.10.1
 )
 
 require (
