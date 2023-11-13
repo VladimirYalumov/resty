@@ -22,7 +22,7 @@ func Init(mm ...middleware.Middleware) {
 	additionalMiddlewares = append(additionalMiddlewares, &middleware.RequestValidate{})
 }
 
-type Handler[T any] struct {
+type handler[T any] struct {
 	*cors.Cors
 	log *logger.Logger
 
@@ -30,7 +30,14 @@ type Handler[T any] struct {
 	data      *T
 }
 
-func (h *Handler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func NewHandler[T any](data *T, log *logger.Logger) *handler[T] {
+	return &handler[T]{
+		data: data,
+		log:  log,
+	}
+}
+
+func (h *handler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer getDeferCatchPanic(h.log, w)
 
 	ctx, span := tracer.StartSpan(context.Background(), r.URL.Path)
@@ -58,7 +65,7 @@ func (h *Handler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (h *Handler[T]) Endpoint(
+func (h *handler[T]) Endpoint(
 	method,
 	path string,
 	request requests.Request, action func(ctx context.Context, req requests.Request, w http.ResponseWriter),
@@ -71,8 +78,4 @@ func (h *Handler[T]) Endpoint(
 	}
 	h.endpoints[key].middlewares[middleware.KeyRequestValidate] = true
 	h.endpoints[key].middlewares[middleware.KeyRequestValidate] = true
-}
-
-func (h *Handler[T]) SetAdditionalData(data *T) {
-	h.data = data
 }
