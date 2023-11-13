@@ -11,7 +11,7 @@ import (
 
 const shutdownTimeout = 3 * time.Second
 
-func RunServer[T any](ctx context.Context, h *handler[T], closerFns ...func(ctx context.Context) error) {
+func RunServer(ctx context.Context, h *handler, closerFns ...func(ctx context.Context) error) {
 	c := &closer.Closer{}
 	for _, closerFn := range closerFns {
 		c.Add(closerFn)
@@ -34,7 +34,7 @@ func RunServer[T any](ctx context.Context, h *handler[T], closerFns ...func(ctx 
 	logger.Info(ctx, "stop")
 }
 
-func setCors[T any](handler *handler[T]) http.Handler {
+func setCors[T any](handler *handler) http.Handler {
 	co := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"},

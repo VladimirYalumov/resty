@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/VladimirYalumov/logger"
-	"github.com/VladimirYalumov/resty/errors"
 	"github.com/VladimirYalumov/tracer"
 	"net/http"
 	"resty/middleware"
@@ -22,22 +21,20 @@ func Init(mm ...middleware.Middleware) {
 	additionalMiddlewares = append(additionalMiddlewares, &middleware.RequestValidate{})
 }
 
-type handler[T any] struct {
+type handler struct {
 	*cors.Cors
 	log *logger.Logger
 
-	endpoints map[endpointKey]*endpoint[T]
-	data      *T
+	endpoints map[endpointKey]*endpoint
 }
 
-func NewHandler[T any](data *T, log *logger.Logger) *handler[T] {
-	return &handler[T]{
-		data: data,
-		log:  log,
+func NewHandler[T any](data *T, log *logger.Logger) *handler {
+	return &handler{
+		log: log,
 	}
 }
 
-func (h *handler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer getDeferCatchPanic(h.log, w)
 
 	ctx, span := tracer.StartSpan(context.Background(), r.URL.Path)
@@ -61,19 +58,24 @@ func (h *handler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, customError := e.Action(ctx, req, w)
+	resp, httpCode := e.Action(ctx, req)
+	w.WriteHeader(httpCode)
+	if err := resp.PrepareResponse(w); err != nil {
+		w.WriteHeader(http.StatusExpectationFailed)
+		_, _ = w.Write([]byte{})
+	}
 	return
 }
 
-func (h *handler[T]) Endpoint(
+func (h *handler) Endpoint(
 	method,
 	path string,
 	request requests.Request,
-	action func(ctx context.Context, data T, req requests.Request) (responses.Response, errors.CustomError),
+	action func(ctx context.Context, req requests.Request) (responses.Response, int),
 	mm ...string,
 ) {
 	key := endpointKey{path, method}
-	h.endpoints[key] = &endpoint[T]{method: method, Action: action, request: request, data: h.data}
+	h.endpoints[key] = &endpoint{method: method, Action: action, request: request}
 	for _, m := range mm {
 		h.endpoints[key].middlewares[m] = true
 	}

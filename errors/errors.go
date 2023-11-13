@@ -31,32 +31,35 @@ var CustomErrorMap map[int32]CustomError
 
 func Init(additionalErrorsMap map[int32]CustomError) {
 	CustomErrorMap = make(map[int32]CustomError)
-	CustomErrorMap[ErrorUnableAddData] = CustomError{http.StatusInternalServerError, "Internal error", "Unable to add data to the table"}
-	CustomErrorMap[ErrorUnableSendMessage] = CustomError{http.StatusBadRequest, "Send message error", "Unable to send message"}
-	CustomErrorMap[ErrorInvalidRequest] = CustomError{http.StatusNotAcceptable, "Invalid request", "Request does not meet the requirements"}
-	CustomErrorMap[ErrorCustomError] = CustomError{http.StatusBadRequest, "", "Custom api_errors that will continue the flow"}
-	CustomErrorMap[ErrorIncorrectVerifyCode] = CustomError{http.StatusForbidden, "Incorrect verify code", "Incorrect verify code or code is no longer in redis"}
-	CustomErrorMap[ErrorUnableGetData] = CustomError{http.StatusInternalServerError, "Internal error", "Unable to get data from the table"}
-	CustomErrorMap[ErrorInvalidAccess] = CustomError{http.StatusForbidden, "Access denied", "Invalid client or user not a creator"}
-	CustomErrorMap[ErrorUserNotFound] = CustomError{http.StatusNotFound, "User not found", "User not found in db"}
-	CustomErrorMap[ErrorUserIsNotVerify] = CustomError{http.StatusForbidden, "User is not verify", "User in db is not active"}
-	CustomErrorMap[ErrorUserUnauthorized] = CustomError{http.StatusUnauthorized, "User is unauthorized", "User has not an auth token"}
+	CustomErrorMap[ErrorUnableAddData] = CustomError{http.StatusInternalServerError, "internal error", "Unable to add data to the table"}
+	CustomErrorMap[ErrorUnableSendMessage] = CustomError{http.StatusBadRequest, "send message error", "Unable to send message"}
+	CustomErrorMap[ErrorInvalidRequest] = CustomError{http.StatusNotAcceptable, "invalid request", "Request does not meet the requirements"}
+	CustomErrorMap[ErrorCustomError] = CustomError{http.StatusBadRequest, "", "custom api_errors that will continue the flow"}
+	CustomErrorMap[ErrorIncorrectVerifyCode] = CustomError{http.StatusForbidden, "incorrect verify code", "Incorrect verify code or code is no longer in redis"}
+	CustomErrorMap[ErrorUnableGetData] = CustomError{http.StatusInternalServerError, "internal error", "Unable to get data from the table"}
+	CustomErrorMap[ErrorInvalidAccess] = CustomError{http.StatusForbidden, "access denied", "Invalid client or user not a creator"}
+	CustomErrorMap[ErrorUserNotFound] = CustomError{http.StatusNotFound, "user not found", "User not found in db"}
+	CustomErrorMap[ErrorUserIsNotVerify] = CustomError{http.StatusForbidden, "user is not verify", "User in db is not active"}
+	CustomErrorMap[ErrorUserUnauthorized] = CustomError{http.StatusUnauthorized, "user is unauthorized", "User has not an auth token"}
 	CustomErrorMap[ErrorCritical] = CustomError{http.StatusInternalServerError, "critical error", "Some error in code"}
-	CustomErrorMap[ErrorNotFound] = CustomError{http.StatusNotFound, "Not found", "Something not found"}
+	CustomErrorMap[ErrorNotFound] = CustomError{http.StatusNotFound, "not found", "Something not found"}
 
 	for k, v := range additionalErrorsMap {
 		CustomErrorMap[k] = v
 	}
 }
 
-func GetCustomError(w http.ResponseWriter, msg string, code int32) error {
-	resp := new(responses.ErrorResponse)
+func GetCustomError(msg string, code int32) (*responses.ErrorResponse, int) {
+	customError, ok := CustomErrorMap[code]
+	if !ok {
+		return &responses.ErrorResponse{Code: ErrorCustomError, Message: "undefined"}, http.StatusBadRequest
+	}
+
+	resp := &responses.ErrorResponse{Code: code}
 	if msg == "" {
-		resp.Message = CustomErrorMap[code].Message
+		resp.Message = customError.Message
 	} else {
 		resp.Message = msg
 	}
-	resp.Code = code
-	w.WriteHeader(CustomErrorMap[code].HttpCode)
-	return resp.PrepareResponse(w)
+	return resp, customError.HttpCode
 }

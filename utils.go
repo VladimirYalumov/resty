@@ -2,6 +2,7 @@ package resty
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"resty/errors"
@@ -39,7 +40,9 @@ func CheckAction(r *http.Request, req requests.Request, w http.ResponseWriter) r
 	code, msg := initRequest.Execute(currentRequest)
 
 	if code != errors.ErrorNoError {
-		errors.GetCustomError(w, msg, code)
+		resp, httpCode := GetCustomError(msg, code)
+		w.WriteHeader(httpCode)
+		_ = json.NewEncoder(w).Encode(resp)
 		return nil
 	}
 
