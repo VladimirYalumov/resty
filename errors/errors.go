@@ -1,8 +1,8 @@
 package errors
 
 import (
+	"github.com/VladimirYalumov/resty/responses"
 	"net/http"
-	"resty/responses"
 )
 
 const ErrorNoError = -1

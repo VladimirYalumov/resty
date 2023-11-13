@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/VladimirYalumov/logger"
+	"github.com/VladimirYalumov/resty/middleware"
+	"github.com/VladimirYalumov/resty/requests"
+	"github.com/VladimirYalumov/resty/responses"
 	"github.com/VladimirYalumov/tracer"
 	"net/http"
-	"resty/middleware"
-	"resty/requests"
-	"resty/responses"
 )
 
 var additionalMiddlewares []middleware.Middleware
@@ -53,7 +53,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req := CheckAction(r, e.request, w)
+	req := CheckAction(r, e.request(), w)
 	if req == nil {
 		return
 	}

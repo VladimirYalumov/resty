@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"fmt"
-	"resty/errors"
-	"resty/requests"
+	"github.com/VladimirYalumov/resty/errors"
+	"github.com/VladimirYalumov/resty/requests"
 )
 
 const KeyRequestValidate = "request_validate"
@@ -12,7 +12,7 @@ type RequestValidate struct {
 	next Middleware
 }
 
-func (r *RequestValidate) Execute(req *requests.Request) (int32, string) {
+func (r *RequestValidate) Execute(req requests.Request) (int32, string) {
 	val, ok := req.Middlewares()[r.getKey()]
 	if !ok || !val {
 		return r.next.Execute(req)

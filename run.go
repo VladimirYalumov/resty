@@ -3,9 +3,9 @@ package resty
 import (
 	"context"
 	"github.com/VladimirYalumov/logger"
+	"github.com/VladimirYalumov/resty/closer"
 	"github.com/rs/cors"
 	"net/http"
-	"resty/closer"
 	"time"
 )
 
