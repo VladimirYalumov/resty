@@ -3,16 +3,13 @@ package resty
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/VladimirYalumov/logger"
 	"github.com/VladimirYalumov/tracer"
 	"net/http"
 	"resty/action"
-	"resty/errors"
 	"resty/middleware"
 	"resty/requests"
 	"resty/responses"
-	"runtime/debug"
 )
 
 var additionalMiddlewares []middleware.Middleware
@@ -25,16 +22,15 @@ func Init(mm ...middleware.Middleware) {
 	additionalMiddlewares = append(additionalMiddlewares, &middleware.RequestValidate{})
 }
 
-type Handler struct {
+type Handler[T any] struct {
 	*cors.Cors
 	log *logger.Logger
+
+	endpoints map[endpointKey]*endpoint[T]
+	data      *T
 }
 
-func NewHandler(log *logger.Logger) *Handler {
-	return &Handler{log: log}
-}
-
-func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *Handler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer getDeferCatchPanic(h.log, w)
 
 	ctx, span := tracer.StartSpan(context.Background(), r.URL.Path)
@@ -62,38 +58,21 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func getDeferCatchPanic(log *logger.Logger, w http.ResponseWriter) {
-	if rec := recover(); rec != any(nil) {
-		logger.Error(
-			logger.ToContext(context.Background(), log),
-			fmt.Errorf("error: %v", rec), "critical error", "stacktrace", string(debug.Stack()),
-		)
-		errors.GetCustomError(w, "", errors.ErrorCritical)
-		return
+func (h *Handler[T]) Endpoint(
+	method,
+	path string,
+	request requests.Request, action func(ctx context.Context, req requests.Request, w http.ResponseWriter),
+	mm ...string,
+) {
+	key := endpointKey{path, method}
+	h.endpoints[key] = &endpoint[T]{method: method, Action: action, request: request, data: h.data}
+	for _, m := range mm {
+		h.endpoints[key].middlewares[m] = true
 	}
+	h.endpoints[key].middlewares[middleware.KeyRequestValidate] = true
+	h.endpoints[key].middlewares[middleware.KeyRequestValidate] = true
 }
 
-func CheckAction(r *http.Request, req requests.Request, w http.ResponseWriter) requests.Request {
-	currentRequest := &req
-	checkRequest := &middleware.RequestCheck{}
-
-	for i, additionalMiddleware := range additionalMiddlewares {
-		if i+1 == len(additionalMiddlewares) {
-			additionalMiddleware.SetNext(checkRequest)
-			break
-		}
-		additionalMiddleware.SetNext(additionalMiddlewares[i+1])
-	}
-
-	initRequest := middleware.NewRequestInit(r)
-	initRequest.SetNext(additionalMiddlewares[0])
-
-	code, msg := initRequest.Execute(currentRequest)
-
-	if code != errors.ErrorNoError {
-		errors.GetCustomError(w, msg, code)
-		return nil
-	}
-
-	return *currentRequest
+func (h *Handler[T]) SetAdditionalData(data *T) {
+	h.data = data
 }
