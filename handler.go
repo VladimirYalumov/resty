@@ -28,7 +28,7 @@ type handler struct {
 	endpoints map[endpointKey]*endpoint
 }
 
-func NewHandler[T any](data *T, log *logger.Logger) *handler {
+func NewHandler(log *logger.Logger) *handler {
 	return &handler{
 		log: log,
 	}
