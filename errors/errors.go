@@ -1,7 +1,6 @@
 package errors
 
 import (
-	"encoding/json"
 	"net/http"
 	"resty/responses"
 )
@@ -22,42 +21,42 @@ const ErrorCritical = 10           // ErrorCritical Some error in code
 
 const ErrorNotFound = 11 // ErrorNotFound Object not found in db
 
-type CustomErrors struct {
+type CustomError struct {
 	HttpCode    int    `json:"httpCode"`
 	Message     string `json:"message"`
 	Description string `json:"description"`
 }
 
-var customErrorsMap map[int32]CustomErrors
+var CustomErrorMap map[int32]CustomError
 
-func Init(additionalErrorsMap map[int32]CustomErrors) {
-	customErrorsMap = make(map[int32]CustomErrors)
-	customErrorsMap[ErrorUnableAddData] = CustomErrors{http.StatusInternalServerError, "Internal error", "Unable to add data to the table"}
-	customErrorsMap[ErrorUnableSendMessage] = CustomErrors{http.StatusBadRequest, "Send message error", "Unable to send message"}
-	customErrorsMap[ErrorInvalidRequest] = CustomErrors{http.StatusNotAcceptable, "Invalid request", "Request does not meet the requirements"}
-	customErrorsMap[ErrorCustomError] = CustomErrors{http.StatusBadRequest, "", "Custom api_errors that will continue the flow"}
-	customErrorsMap[ErrorIncorrectVerifyCode] = CustomErrors{http.StatusForbidden, "Incorrect verify code", "Incorrect verify code or code is no longer in redis"}
-	customErrorsMap[ErrorUnableGetData] = CustomErrors{http.StatusInternalServerError, "Internal error", "Unable to get data from the table"}
-	customErrorsMap[ErrorInvalidAccess] = CustomErrors{http.StatusForbidden, "Access denied", "Invalid client or user not a creator"}
-	customErrorsMap[ErrorUserNotFound] = CustomErrors{http.StatusNotFound, "User not found", "User not found in db"}
-	customErrorsMap[ErrorUserIsNotVerify] = CustomErrors{http.StatusForbidden, "User is not verify", "User in db is not active"}
-	customErrorsMap[ErrorUserUnauthorized] = CustomErrors{http.StatusUnauthorized, "User is unauthorized", "User has not an auth token"}
-	customErrorsMap[ErrorCritical] = CustomErrors{http.StatusInternalServerError, "critical error", "Some error in code"}
-	customErrorsMap[ErrorNotFound] = CustomErrors{http.StatusNotFound, "Not found", "Something not found"}
+func Init(additionalErrorsMap map[int32]CustomError) {
+	CustomErrorMap = make(map[int32]CustomError)
+	CustomErrorMap[ErrorUnableAddData] = CustomError{http.StatusInternalServerError, "Internal error", "Unable to add data to the table"}
+	CustomErrorMap[ErrorUnableSendMessage] = CustomError{http.StatusBadRequest, "Send message error", "Unable to send message"}
+	CustomErrorMap[ErrorInvalidRequest] = CustomError{http.StatusNotAcceptable, "Invalid request", "Request does not meet the requirements"}
+	CustomErrorMap[ErrorCustomError] = CustomError{http.StatusBadRequest, "", "Custom api_errors that will continue the flow"}
+	CustomErrorMap[ErrorIncorrectVerifyCode] = CustomError{http.StatusForbidden, "Incorrect verify code", "Incorrect verify code or code is no longer in redis"}
+	CustomErrorMap[ErrorUnableGetData] = CustomError{http.StatusInternalServerError, "Internal error", "Unable to get data from the table"}
+	CustomErrorMap[ErrorInvalidAccess] = CustomError{http.StatusForbidden, "Access denied", "Invalid client or user not a creator"}
+	CustomErrorMap[ErrorUserNotFound] = CustomError{http.StatusNotFound, "User not found", "User not found in db"}
+	CustomErrorMap[ErrorUserIsNotVerify] = CustomError{http.StatusForbidden, "User is not verify", "User in db is not active"}
+	CustomErrorMap[ErrorUserUnauthorized] = CustomError{http.StatusUnauthorized, "User is unauthorized", "User has not an auth token"}
+	CustomErrorMap[ErrorCritical] = CustomError{http.StatusInternalServerError, "critical error", "Some error in code"}
+	CustomErrorMap[ErrorNotFound] = CustomError{http.StatusNotFound, "Not found", "Something not found"}
 
 	for k, v := range additionalErrorsMap {
-		customErrorsMap[k] = v
+		CustomErrorMap[k] = v
 	}
 }
 
-func GetCustomError(w http.ResponseWriter, msg string, code int32) {
-	errorResponse := new(responses.ErrorResponse)
+func GetCustomError(w http.ResponseWriter, msg string, code int32) error {
+	resp := new(responses.ErrorResponse)
 	if msg == "" {
-		errorResponse.Message = customErrorsMap[code].Message
+		resp.Message = CustomErrorMap[code].Message
 	} else {
-		errorResponse.Message = msg
+		resp.Message = msg
 	}
-	errorResponse.Code = code
-	w.WriteHeader(customErrorsMap[code].HttpCode)
-	_ = json.NewEncoder(w).Encode(&errorResponse)
+	resp.Code = code
+	w.WriteHeader(CustomErrorMap[code].HttpCode)
+	return resp.PrepareResponse(w)
 }

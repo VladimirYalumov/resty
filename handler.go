@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/VladimirYalumov/logger"
+	"github.com/VladimirYalumov/resty/errors"
 	"github.com/VladimirYalumov/tracer"
 	"net/http"
-	"resty/action"
 	"resty/middleware"
 	"resty/requests"
 	"resty/responses"
@@ -48,27 +48,28 @@ func (h *handler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	endpoint := action.GetEndpoint(r.Method, r.URL.Path)
-	if endpoint == nil {
+	e, ok := h.endpoints[endpointKey{r.URL.Path, r.Method}]
+	if !ok || e == nil {
 		logger.Warn(ctx, "unknown method", "method", r.Method, "path", r.URL.Path)
 		w.WriteHeader(405)
 		_ = json.NewEncoder(w).Encode(&responses.ErrorResponse{Message: "unknown method"})
 		return
 	}
 
-	req := CheckAction(r, endpoint.Request(), w)
+	req := CheckAction(r, e.request, w)
 	if req == nil {
 		return
 	}
 
-	endpoint.Action(ctx, req, w)
+	resp, customError := e.Action(ctx, req, w)
 	return
 }
 
 func (h *handler[T]) Endpoint(
 	method,
 	path string,
-	request requests.Request, action func(ctx context.Context, req requests.Request, w http.ResponseWriter),
+	request requests.Request,
+	action func(ctx context.Context, data T, req requests.Request) (responses.Response, errors.CustomError),
 	mm ...string,
 ) {
 	key := endpointKey{path, method}

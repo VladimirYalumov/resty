@@ -2,7 +2,8 @@ package resty
 
 import (
 	"context"
-	"net/http"
+	"github.com/VladimirYalumov/resty/errors"
+	"github.com/VladimirYalumov/resty/responses"
 	"resty/requests"
 )
 
@@ -13,7 +14,7 @@ type endpointKey struct {
 
 type endpoint[T any] struct {
 	method  string
-	Action  func(ctx context.Context, req requests.Request, w http.ResponseWriter)
+	Action  func(ctx context.Context, data T, req requests.Request) (responses.Response, errors.CustomError)
 	request requests.Request
 
 	middlewares map[string]bool
