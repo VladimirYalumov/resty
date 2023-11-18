@@ -67,17 +67,17 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (h *handler) Endpoints(endpoints map[endpointKey]*endpoint[requests.Request]) {
-	h.endpoints = endpoints
+func (h *handler) Endpoint(endpointKey endpointKey, endpoint *endpoint[requests.Request]) {
+	h.endpoints[endpointKey] = endpoint
 }
 
-func Endpoint[R requests.Request](method, path string, request R, action func(ctx context.Context, req R) (responses.Response, int), mm ...string) (endpointKey, *endpoint[R]) {
+func NewEndpoint[R requests.Request](method, path string, request R, action func(ctx context.Context, req R) (responses.Response, int), mm ...string) (endpointKey, *endpoint[R]) {
 	e := &endpoint[R]{method: method, Action: action, request: request}
 	for _, m := range mm {
 		e.middlewares[m] = true
 	}
 	e.middlewares[middleware.KeyRequestValidate] = true
-	e.middlewares[middleware.KeyRequestValidate] = true
+	e.middlewares[middleware.KeyRequestInit] = true
 
 	return endpointKey{path, method}, e
 }
