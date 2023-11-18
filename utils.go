@@ -28,12 +28,13 @@ func getDeferCatchPanic(log *logger.Logger, w http.ResponseWriter) {
 func CheckAction(r *http.Request, req requests.Request, w http.ResponseWriter) requests.Request {
 	checkRequest := &middleware.RequestCheck{}
 
-	for i, additionalMiddleware := range additionalMiddlewares {
+	for i := 0; i < len(additionalMiddlewares); i++ {
+		fmt.Println(additionalMiddlewares[i])
 		if i+1 == len(additionalMiddlewares) {
-			additionalMiddleware.SetNext(checkRequest)
+			additionalMiddlewares[i].SetNext(checkRequest)
 			break
 		}
-		additionalMiddleware.SetNext(additionalMiddlewares[i+1])
+		additionalMiddlewares[i].SetNext(additionalMiddlewares[i+1])
 	}
 
 	initRequest := middleware.NewRequestInit(r)
