@@ -67,6 +67,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (h *handler) Endpoints(endpoints map[endpointKey]*endpoint[requests.Request]) {
+	h.endpoints = endpoints
+}
+
 func Endpoint[R requests.Request](method, path string, request R, action func(ctx context.Context, req R) (responses.Response, int), mm ...string) (endpointKey, *endpoint[R]) {
 	e := &endpoint[R]{method: method, Action: action, request: request}
 	for _, m := range mm {
