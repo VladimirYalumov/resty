@@ -34,7 +34,7 @@ func RunServer(ctx context.Context, h *handler, closerFns ...func(ctx context.Co
 	logger.Info(ctx, "stop")
 }
 
-func setCors[T any](handler *handler) http.Handler {
+func setCors(handler *handler) http.Handler {
 	co := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"},
