@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/VladimirYalumov/logger"
 	"github.com/VladimirYalumov/resty/errors"
 	"github.com/VladimirYalumov/resty/middleware"
 	"github.com/VladimirYalumov/resty/requests"

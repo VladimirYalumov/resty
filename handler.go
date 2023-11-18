@@ -8,6 +8,7 @@ import (
 	"github.com/VladimirYalumov/resty/requests"
 	"github.com/VladimirYalumov/resty/responses"
 	"github.com/VladimirYalumov/tracer"
+	"github.com/rs/cors"
 	"net/http"
 )
 
