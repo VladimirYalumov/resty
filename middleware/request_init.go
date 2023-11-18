@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/VladimirYalumov/resty/errors"
 	"github.com/VladimirYalumov/resty/requests"
 	"net/http"
@@ -19,12 +18,6 @@ func NewRequestInit(r *http.Request) *RequestInit {
 }
 
 func (r *RequestInit) Execute(req requests.Request) (int32, string) {
-	val, ok := req.Middlewares()[r.GetKey()]
-	fmt.Println(r.GetKey())
-	fmt.Println(req.Middlewares())
-	if !ok || !val {
-		return r.next.Execute(req)
-	}
 	if err := req.Set(r.r); err != nil {
 		return errors.ErrorInvalidRequest, ""
 	}
