@@ -23,10 +23,10 @@ type handler struct {
 
 func NewHandler(log *logger.Logger, mm ...middleware.Middleware) *handler {
 	additionalMiddlewares = make([]middleware.Middleware, len(mm)+1, len(mm)+1)
+	additionalMiddlewares[0] = &middleware.RequestValidate{}
 	for i := len(mm) - 1; i > -1; i-- {
-		additionalMiddlewares[i] = mm[i]
+		additionalMiddlewares[i+1] = mm[i]
 	}
-	additionalMiddlewares[len(mm)] = &middleware.RequestValidate{}
 
 	return &handler{
 		log:       log,
