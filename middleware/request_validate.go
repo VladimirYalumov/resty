@@ -14,6 +14,8 @@ type RequestValidate struct {
 
 func (r *RequestValidate) Execute(req requests.Request) (int32, string) {
 	val, ok := req.Middlewares()[r.GetKey()]
+	fmt.Println(r.GetKey())
+	fmt.Println(req.Middlewares())
 	if !ok || !val {
 		return r.next.Execute(req)
 	}

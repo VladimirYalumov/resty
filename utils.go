@@ -38,6 +38,7 @@ func CheckAction(r *http.Request, req requests.Request, w http.ResponseWriter) r
 	initRequest := middleware.NewRequestInit(r)
 	initRequest.SetNext(additionalMiddlewares[0])
 
+	fmt.Printf("request %T", req)
 	code, msg := initRequest.Execute(req)
 
 	if code != errors.ErrorNoError {
