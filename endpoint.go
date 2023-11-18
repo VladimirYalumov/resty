@@ -11,10 +11,10 @@ type endpointKey struct {
 	method string
 }
 
-type endpoint struct {
+type endpoint[R requests.Request] struct {
 	method  string
-	Action  func(ctx context.Context, req requests.Request) (responses.Response, int)
-	request func() requests.Request
+	Action  func(ctx context.Context, req R) (responses.Response, int)
+	request R
 
 	middlewares map[string]bool
 }
