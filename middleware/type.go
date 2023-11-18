@@ -8,7 +8,7 @@ import (
 type Middleware interface {
 	Execute(requests.Request) (int32, string)
 	SetNext(Middleware)
-	getKey() string
+	GetKey() string
 }
 
 type RequestCheck struct {
@@ -23,6 +23,6 @@ func (r *RequestCheck) SetNext(next Middleware) {
 	r.next = next
 }
 
-func (r *RequestCheck) getKey() string {
+func (r *RequestCheck) GetKey() string {
 	return ""
 }
