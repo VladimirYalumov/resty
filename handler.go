@@ -31,7 +31,8 @@ type handler struct {
 
 func NewHandler(log *logger.Logger) *handler {
 	return &handler{
-		log: log,
+		log:       log,
+		endpoints: make(map[endpointKey]*endpoint),
 	}
 }
 
