@@ -22,7 +22,7 @@ type handler struct {
 }
 
 func NewHandler(log *logger.Logger, mm ...middleware.Middleware) *handler {
-	additionalMiddlewares = make([]middleware.Middleware, len(mm)+2)
+	additionalMiddlewares = make([]middleware.Middleware, len(mm)+1)
 	for i := len(mm) - 1; i != 0; i-- {
 		additionalMiddlewares = append(additionalMiddlewares, mm[i])
 	}
