@@ -13,7 +13,7 @@ type RequestValidate struct {
 }
 
 func (r *RequestValidate) Execute(req requests.Request) (int32, string) {
-	val, ok := req.Middlewares()[r.getKey()]
+	val, ok := req.Middlewares()[r.GetKey()]
 	if !ok || !val {
 		return r.next.Execute(req)
 	}
@@ -32,6 +32,6 @@ func (r *RequestValidate) SetNext(next Middleware) {
 	r.next = next
 }
 
-func (r *RequestValidate) getKey() string {
+func (r *RequestValidate) GetKey() string {
 	return KeyRequestValidate
 }

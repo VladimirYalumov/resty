@@ -18,7 +18,7 @@ func NewRequestInit(r *http.Request) *RequestInit {
 }
 
 func (r *RequestInit) Execute(req requests.Request) (int32, string) {
-	val, ok := req.Middlewares()[r.getKey()]
+	val, ok := req.Middlewares()[r.GetKey()]
 	if !ok || !val {
 		return r.next.Execute(req)
 	}
@@ -33,6 +33,6 @@ func (r *RequestInit) SetNext(next Middleware) {
 	r.next = next
 }
 
-func (r *RequestInit) getKey() string {
+func (r *RequestInit) GetKey() string {
 	return KeyRequestInit
 }
