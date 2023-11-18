@@ -3,7 +3,6 @@ package resty
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/VladimirYalumov/logger"
 	"github.com/VladimirYalumov/resty/middleware"
 	"github.com/VladimirYalumov/resty/requests"
@@ -15,14 +14,6 @@ import (
 
 var additionalMiddlewares []middleware.Middleware
 
-func Init(mm ...middleware.Middleware) {
-	additionalMiddlewares = make([]middleware.Middleware, len(mm)+2)
-	for i := len(mm) - 1; i != 0; i-- {
-		additionalMiddlewares = append(additionalMiddlewares, mm[i])
-	}
-	additionalMiddlewares = append(additionalMiddlewares, &middleware.RequestValidate{})
-}
-
 type handler struct {
 	*cors.Cors
 	log *logger.Logger
@@ -30,7 +21,13 @@ type handler struct {
 	endpoints map[endpointKey]*endpoint
 }
 
-func NewHandler(log *logger.Logger) *handler {
+func NewHandler(log *logger.Logger, mm ...middleware.Middleware) *handler {
+	additionalMiddlewares = make([]middleware.Middleware, len(mm)+2)
+	for i := len(mm) - 1; i != 0; i-- {
+		additionalMiddlewares = append(additionalMiddlewares, mm[i])
+	}
+	additionalMiddlewares = append(additionalMiddlewares, &middleware.RequestValidate{})
+
 	return &handler{
 		log:       log,
 		endpoints: make(map[endpointKey]*endpoint),
@@ -49,7 +46,6 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	e, ok := h.endpoints[endpointKey{r.URL.Path, r.Method}]
-	fmt.Println(endpointKey{r.URL.Path, r.Method})
 	if !ok || e == nil {
 		logger.Warn(ctx, "unknown method", "method", r.Method, "path", r.URL.Path)
 		w.WriteHeader(405)
