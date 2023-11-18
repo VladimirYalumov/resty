@@ -25,7 +25,7 @@ type handler struct {
 	*cors.Cors
 	log *logger.Logger
 
-	endpoints map[endpointKey]*endpoint[requests.Request]
+	endpoints map[endpointKey]*endpoint
 }
 
 func NewHandler(log *logger.Logger) *handler {
@@ -58,7 +58,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, httpCode := e.Action(ctx, req)
+	resp, httpCode := e.action(ctx, req)
 	w.WriteHeader(httpCode)
 	if err := resp.PrepareResponse(w); err != nil {
 		w.WriteHeader(http.StatusExpectationFailed)
@@ -67,17 +67,16 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (h *handler) Endpoint(endpointKey endpointKey, endpoint *endpoint[requests.Request]) {
-	h.endpoints[endpointKey] = endpoint
-}
-
-func NewEndpoint[R requests.Request](method, path string, request R, action func(ctx context.Context, req R) (responses.Response, int), mm ...string) (endpointKey, *endpoint[R]) {
-	e := &endpoint[R]{method: method, Action: action, request: request}
+func (h *handler) Endpoint(path, method string, request requests.Request, action func(ctx context.Context, req requests.Request) (responses.Response, int), mm ...string) {
+	e := &endpoint{
+		action:  action,
+		request: request,
+	}
 	for _, m := range mm {
 		e.middlewares[m] = true
 	}
 	e.middlewares[middleware.KeyRequestValidate] = true
 	e.middlewares[middleware.KeyRequestInit] = true
 
-	return endpointKey{path, method}, e
+	h.endpoints[endpointKey{path, method}] = e
 }

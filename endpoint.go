@@ -11,10 +11,8 @@ type endpointKey struct {
 	method string
 }
 
-type endpoint[R requests.Request] struct {
-	method  string
-	Action  func(ctx context.Context, req R) (responses.Response, int)
-	request R
-
+type endpoint struct {
 	middlewares map[string]bool
+	action      func(ctx context.Context, req requests.Request) (responses.Response, int)
+	request     requests.Request
 }

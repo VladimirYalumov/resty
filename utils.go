@@ -47,5 +47,5 @@ func CheckAction(r *http.Request, req requests.Request, w http.ResponseWriter) r
 		return nil
 	}
 
-	return *currentRequest
+	return req
 }
