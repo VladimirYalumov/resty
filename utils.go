@@ -27,6 +27,7 @@ func getDeferCatchPanic(log *logger.Logger, w http.ResponseWriter) {
 
 func CheckAction(r *http.Request, req requests.Request, w http.ResponseWriter) requests.Request {
 	checkRequest := &middleware.RequestCheck{}
+	fmt.Println(additionalMiddlewares)
 	for i := 0; i < len(additionalMiddlewares); i++ {
 		if i+1 == len(additionalMiddlewares) {
 			additionalMiddlewares[i].SetNext(checkRequest)
