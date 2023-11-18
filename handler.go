@@ -3,6 +3,7 @@ package resty
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/VladimirYalumov/logger"
 	"github.com/VladimirYalumov/resty/middleware"
 	"github.com/VladimirYalumov/resty/requests"
@@ -48,6 +49,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	e, ok := h.endpoints[endpointKey{r.URL.Path, r.Method}]
+	fmt.Println(endpointKey{r.URL.Path, r.Method})
 	if !ok || e == nil {
 		logger.Warn(ctx, "unknown method", "method", r.Method, "path", r.URL.Path)
 		w.WriteHeader(405)
