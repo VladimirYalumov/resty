@@ -2,45 +2,31 @@ package resty
 
 import (
 	"context"
+	"fmt"
 	"github.com/VladimirYalumov/logger"
 	"github.com/VladimirYalumov/resty/closer"
-	"github.com/rs/cors"
 	"net/http"
-	"time"
 )
 
-const shutdownTimeout = 3 * time.Second
-
-func RunServer(ctx context.Context, h *handler, closerFns ...func(ctx context.Context) error) {
+func RunServer(ctx context.Context, h *handler, opt Options, closerFns ...func(ctx context.Context) error) {
 	c := &closer.Closer{}
 	for _, closerFn := range closerFns {
 		c.Add(closerFn)
 	}
 
 	go func() {
-		if err := http.ListenAndServe(":8080", setCors(h)); err != nil {
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", opt.Port), setCors(h)); err != nil {
 			logger.Error(ctx, err, "serve")
 		}
 	}()
 	logger.Info(ctx, "start server", "port", 8080)
 	<-ctx.Done()
 
-	shutdownCtx, cancel := context.WithTimeout(logger.ToContext(context.Background(), logger.FromContext(ctx)), shutdownTimeout)
+	shutdownCtx, cancel := context.WithTimeout(logger.ToContext(context.Background(), logger.FromContext(ctx)), opt.Timeout)
 	defer cancel()
 
 	if err := c.Close(shutdownCtx); err != nil {
 		logger.Error(ctx, err, "shutdown")
 	}
 	logger.Info(ctx, "stop")
-}
-
-func setCors(handler *handler) http.Handler {
-	co := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"},
-		AllowedHeaders:   []string{"Accept", "Content-Type", "Authorization", "Client"},
-		AllowCredentials: true,
-	})
-
-	return co.Handler(handler)
 }
