@@ -57,7 +57,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if req == nil {
 		return
 	}
-	logger.Info(ctx, "request", "content", req)
+	logger.Info(ctx, "request", "content", req, "method", r.Method, "path", r.URL.Path)
 	resp, httpCode := e.action(ctx, req)
 	w.WriteHeader(httpCode)
 	if err := resp.PrepareResponse(w); err != nil {
